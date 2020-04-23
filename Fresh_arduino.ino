@@ -42,14 +42,25 @@ void setup() {
 }
 
 void loop() {
+  
+  String mmd = "GET /getRecentData/1 HTTP/1.1\r\nHost: 175.208.85.188\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n";
+  wifi.send(mmd.c_str(), mmd.length());
+  
+  int leng;
+  String c;
+  
+  if((leng = WIFI.available())> 0) {
+     c = WIFI.readString();
+  }
+  
   String sens = "temperature=";
   sens += temp;
   sens += "&humidity=";
   sens += hum;
   sens += "&g_humidity=";
   sens += g_hum;
-  sens += "&machine_num=4";
-  String cmd = "POST /upload HTTP/1.1\r\nHost: 175.208.85.188\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: ";
+  sens += "&machine_num=1";
+  String cmd = "POST /uploadData HTTP/1.1\r\nHost: 175.208.85.188\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: ";
   cmd += String(sens.length());
   cmd += "\r\n\r\n";
   cmd += sens;
