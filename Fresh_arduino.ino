@@ -3,6 +3,7 @@
 
 #define SSID      "304-1"
 #define PASSWORD  "99341790!@"
+#define HOST_NAME "175.208.85.188"
 #define HOST_PORT (8421)
 
 SoftwareSerial WIFI = SoftwareSerial(2, 3);
