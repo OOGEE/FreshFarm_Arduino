@@ -65,5 +65,19 @@ if (wifi.createTCP(HOST_NAME, HOST_PORT)) {
   cmd += "\r\n\r\n";
   cmd += sens;
   
-  // 서버에서 string 전송
+  // 서버에 string 전송
   wifi.send(cmd.c_str(), cmd.length());
+
+  // GET을 하기 위한 http 프로토콜 작성
+  String mmd = "GET /getRecentData/1 HTTP/1.1\r\nHost: 175.208.85.188\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n";
+
+  // 서버에 string 전송
+  wifi.send(mmd.c_str(), mmd.length());
+  
+  // 서버에서 받아온 string의 값을 c에 저장
+  int leng;
+  String c;
+  
+  if((leng = WIFI.available())> 0) {
+     c = WIFI.readString();
+  }
