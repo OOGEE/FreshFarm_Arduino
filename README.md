@@ -81,3 +81,24 @@ if (wifi.createTCP(HOST_NAME, HOST_PORT)) {
   if((leng = WIFI.available())> 0) {
      c = WIFI.readString();
   }
+
+  // 값이 저장된 c를 data라는 String 변수에 저장한 뒤 문자를 잘 자르기 위해 끝에 ';' 추가
+  String data = c.substring(c.indexOf('{')+1, c.indexOf('}'));
+  data += ',';
+  
+  // 값을 저장할 set_*과 값을 받아오기 위해 위치값을 저장 할 index*_* 변수를 선언
+  int set_temp, set_hum, set_g_hum;
+  int index1_1, index1_2, index1_3, index2_1, index2_2, index2_3;
+
+  // indexOf 함수를 사용하여 ':'과 ','의 위치를 각각의 변수에 저장
+  index1_1 = data.indexOf(':');
+  index1_2 = data.indexOf(':', index1_1+1);
+  index1_3 = data.indexOf(':', index1_2+1);
+  index2_1 = data.indexOf(',');
+  index2_2 = data.indexOf(',', index2_1+1); 
+  index2_3 = data.indexOf(',', index2_2+1);
+  
+  // index*_*의 값과 substring 함수를 이용하여 나온 값을 int로 변환, 값의 순서를 맞춰 각각의 변수에 값 저장
+  set_temp = data.substring(index1_1+1, index2_1).toInt();
+  set_hum = data.substring(index1_2+1, index2_2).toInt();
+  set_g_hum = data.substring(index1_3+1, index2_3).toInt();
