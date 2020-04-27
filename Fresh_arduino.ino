@@ -11,7 +11,8 @@ ESP8266 wifi = ESP8266(WIFI);
 
 void setup() {
   Serial.begin(9600);
-
+  WIFI.begin(9600);
+  
   if (wifi.setOprToStationSoftAP()) {
       Serial.print("to station + softap ok\r\n");
   } else {
@@ -52,6 +53,23 @@ void loop() {
   if((leng = WIFI.available())> 0) {
      c = WIFI.readString();
   }
+
+  String data = c.substring(c.indexOf('{')+1, c.indexOf('}'));
+  data += ',';
+  
+  int set_temp, set_hum, set_g_hum;
+  int index1_1, index1_2, index1_3, index2_1, index2_2, index2_3;
+
+  index1_1 = data.indexOf(':');
+  index1_2 = data.indexOf(':', index1_1+1);
+  index1_3 = data.indexOf(':', index1_2+1);
+  index2_1 = data.indexOf(',');
+  index2_2 = data.indexOf(',', index2_1+1); 
+  index2_3 = data.indexOf(',', index2_2+1);
+  
+  set_temp = data.substring(index1_1+1, index2_1).toInt();
+  set_hum = data.substring(index1_2+1, index2_2).toInt();
+  set_g_hum = data.substring(index1_3+1, index2_3).toInt();
   
   String sens = "temperature=";
   sens += temp;
