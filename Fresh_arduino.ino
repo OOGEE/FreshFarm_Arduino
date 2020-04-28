@@ -75,6 +75,25 @@ void loop() {
   set_temp = data.substring(index1_2+1, index2_2).toInt();
   set_hum = data.substring(index1_3+1, index2_3).toInt();
   set_g_hum = data.substring(index1_4+1, index2_4).toInt();
+
+  if(temp > set_temp) {
+    // 적색등
+  }
+  else if(temp < set_temp) {
+    // 청색등
+  }
+  else {
+    // 녹색등
+  }
+
+  if((g_hum < set_g_hum) && (stack >= 10)) {
+    // 펌프 가동
+    stack = 0;
+  }
+
+  if(hum > set_hum) {
+    // 환기
+  }
   
   String sens = "temperature=";
   sens += temp;
@@ -88,6 +107,8 @@ void loop() {
   cmd += "\r\n\r\n";
   cmd += sens;
   wifi.send(cmd.c_str(), cmd.length());
+
+  stack++;
 
   delay(3000);
 }
