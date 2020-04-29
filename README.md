@@ -21,6 +21,9 @@ FreshFarm_Arduino
 SoftwareSerial WIFI = SoftwareSerial(2, 3); // RX와 TX를 각각 2, 3번 핀에 연결
 ESP8266 wifi = ESP8266(WIFI); // ESP8266을 사용하기 위해 
 
+//무조건 if문을 실행하면 너무 예민하게 반응하기 때문에 이를 제어하기 위함
+int stack = 10;
+
 //통신을 하기 위한 와이파이 쉴드 세팅
 if (wifi.setOprToStationSoftAP()) {
   Serial.print("to station + softap ok\r\n");
@@ -87,18 +90,43 @@ if (wifi.createTCP(HOST_NAME, HOST_PORT)) {
   data += ',';
   
   // 값을 저장할 set_*과 값을 받아오기 위해 위치값을 저장 할 index*_* 변수를 선언
-  int set_temp, set_hum, set_g_hum;
-  int index1_1, index1_2, index1_3, index2_1, index2_2, index2_3;
+  int set_illu,set_temp, set_hum, set_g_hum;
+  int index1_1, index1_2, index1_3, index1_4, index2_1, index2_2, index2_3, index2_4;
 
   // indexOf 함수를 사용하여 ':'과 ','의 위치를 각각의 변수에 저장
   index1_1 = data.indexOf(':');
   index1_2 = data.indexOf(':', index1_1+1);
   index1_3 = data.indexOf(':', index1_2+1);
+  index1_4 = data.indexOf(':', index1_3+1);
   index2_1 = data.indexOf(',');
-  index2_2 = data.indexOf(',', index2_1+1); 
+  index2_2 = data.indexOf(',', index2_1+1);
   index2_3 = data.indexOf(',', index2_2+1);
+  index2_4 = data.indexOf(',', index2_3+1);
   
   // index*_*의 값과 substring 함수를 이용하여 나온 값을 int로 변환, 값의 순서를 맞춰 각각의 변수에 값 저장
-  set_temp = data.substring(index1_1+1, index2_1).toInt();
-  set_hum = data.substring(index1_2+1, index2_2).toInt();
-  set_g_hum = data.substring(index1_3+1, index2_3).toInt();
+  set_illu = data.substring(index1_1+1, index2_1).toInt();
+  set_temp = data.substring(index1_2+1, index2_2).toInt();
+  set_hum = data.substring(index1_3+1, index2_3).toInt();
+  set_g_hum = data.substring(index1_4+1, index2_4).toInt();
+
+  // 온도에 따른 제어를 보여주기 위한 코드
+  if(temp > set_temp) {
+    // 적색등
+  }
+  else if(temp < set_temp) {
+    // 청색등
+  }
+  else {
+    // 녹색등
+  }
+
+  // 토양 습도에 따른 제어를 보여주기 위한 코드
+  if((g_hum < set_g_hum) && (stack >= 10)) {
+    // 펌프 가동
+    stack = 0;
+  }
+
+  // 습도에 따른 제어를 보여주기 위한 코드
+  if(hum > set_hum) {
+    // 환기
+  }
