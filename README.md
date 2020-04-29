@@ -15,7 +15,7 @@ FreshFarm_Arduino
 
 #define SSID        "WIFI-NAME" // WIFI의 이름을 SSID에 정의해놓음
 #define PASSWORD    "PASSWORD" // WIFI의 비밀번호를 PASSWORD에 정의해놓음
-#define HOST_NAME   "IP" // 서버의 주소를 정의해놓음
+#define HOST_NAME   "서버주소" // 서버의 주소를 정의해놓음
 #define HOST_PORT   (****) // 포트번호를 지정해놓음
 
 SoftwareSerial WIFI = SoftwareSerial(2, 3); // RX와 TX를 각각 2, 3번 핀에 연결
@@ -63,7 +63,7 @@ if (wifi.createTCP(HOST_NAME, HOST_PORT)) {
   sens += "&machine_num=4";
   
   // POST를 하기 위한 http 프로토콜 작성
-  String cmd = "POST /upload HTTP/1.1\r\nHost: 175.208.85.188\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: ";
+  String cmd = "POST /ARuploadData HTTP/1.1\r\nHost: 서버주소\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: ";
   cmd += String(sens.length());
   cmd += "\r\n\r\n";
   cmd += sens;
@@ -72,7 +72,7 @@ if (wifi.createTCP(HOST_NAME, HOST_PORT)) {
   wifi.send(cmd.c_str(), cmd.length());
 
   // GET을 하기 위한 http 프로토콜 작성
-  String mmd = "GET /getRecentData/1 HTTP/1.1\r\nHost: 175.208.85.188\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n";
+  String mmd = "GET /ARgetRecentData/1 HTTP/1.1\r\nHost: 서버주소\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n";
 
   // 서버에 string 전송
   wifi.send(mmd.c_str(), mmd.length());
