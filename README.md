@@ -81,7 +81,7 @@ void loop(){
     set_temp = c.substring(index1_2+1, index2_2).toInt();
     set_hum = c.substring(index1_3+1, index2_3).toInt();
     set_g_hum = c.substring(index1_4+1, index2_4).toInt();
-}
+  }
 
   // stack 값이 5가 되면 POST문 실행
   if(stack == 5){
