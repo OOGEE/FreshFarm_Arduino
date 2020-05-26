@@ -29,21 +29,21 @@ void loop(){
   } else {
   }
 
-// WIFI에 연결하기
-if (wifi.joinAP("WI-FI 이름", "WI-FI 비밀번호")) {    
-} else {
-}
+  // WIFI에 연결하기
+  if (wifi.joinAP("WI-FI 이름", "WI-FI 비밀번호")) {    
+  } else {
+  }
 
-if (wifi.disableMUX()) {
-} else {
-}
+  if (wifi.disableMUX()) {
+  } else {
+  }
 
-// tcp 연결, 시리얼문을 플래시메모리에 올려서 사용
-if (wifi.createTCP(HOST_NAME, HOST_PORT)) {
-   Serial.print(F("create tcp ok\r\n"));
-} else {
-  Serial.print(F("create tcp err\r\n\n"));
-}
+  // tcp 연결, 시리얼문을 플래시메모리에 올려서 사용
+  if (wifi.createTCP(HOST_NAME, HOST_PORT)) {
+    Serial.print(F("create tcp ok\r\n"));
+  } else {
+    Serial.print(F("create tcp err\r\n\n"));
+  }
   // stack이 5 미만일때 GET 문장 구현
   if(stack < 5){
     // GET을 하기 위해 mmd에 명령어 입력
