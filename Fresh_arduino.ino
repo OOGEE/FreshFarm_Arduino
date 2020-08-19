@@ -1,6 +1,5 @@
 #include <SoftwareSerial.h>
 #include "ESP8266.h"
-#include <Adafruit_NeoPixel.h>
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
 #include <DHT_U.h>
@@ -10,7 +9,6 @@
 
 SoftwareSerial WIFI = SoftwareSerial(2, 3);
 ESP8266 wifi = ESP8266(WIFI);
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(25, 13, NEO_GRB + NEO_KHZ800);
 DHT dht(5, DHT22);
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
@@ -20,16 +18,14 @@ float hum, temp;
 void setup() {
   Serial.begin(9600);
   dht.begin();
-  pixels.setBrightness(255);
-  pixels.begin();  // 네오픽셀 제어 시작
-  pixels.show();  // 네오픽셀 초기화
-  pinMode(4, OUTPUT);
-  pinMode(6, OUTPUT);
-  pinMode(8, OUTPUT);
+  pinMode(4, OUTPUT); // motor
+  pinMode(6, OUTPUT); // LED
   pinMode(7, OUTPUT);
   pinMode(9, OUTPUT);
-  pinMode(11, OUTPUT);
+  pinMode(8, OUTPUT);
   pinMode(10, OUTPUT);
+  pinMode(12, OUTPUT);
+  pinMode(11, OUTPUT);
 
   lcd.init();
   lcd.backlight();
@@ -39,7 +35,8 @@ void setup() {
 }
 
 void loop() {
-  digitalWrite(4, LOW);
+  digitalWrite(4, HIGH);
+  digitalWrite(6, HIGH);
 
   hum = dht.readHumidity();
   temp = dht.readTemperature();
@@ -65,6 +62,7 @@ void loop() {
   } else {
   }
 
+
   if (wifi.joinAP("304-1", "99341790!@")) {     
   } else {
   }
@@ -73,13 +71,13 @@ void loop() {
   } else {
   }
  
-  if (wifi.createTCP("175.208.85.188" , (8421))) {
+  if (wifi.createTCP("darleak-nas.duckdns.org" , (9999))) {
        Serial.print(F("create tcp ok\r\n"));
    } else {
        Serial.print(F("create tcp err\r\n\n"));
    }
   if(stack < 5){
-    String mmd = "GET /ARgetRecentData/1 HTTP/1.1\r\nHost: 175.208.85.188:8421\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n";
+    String mmd = "GET /ARgetRecentData/1 HTTP/1.1\r\nHost: dalreak-nas.duckdns.org:9999\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n";
     wifi.send(mmd.c_str(), mmd.length());
   
     int leng;
@@ -117,66 +115,43 @@ void loop() {
     }
 
     if(set_illu == 0) {
-      for (int i = 0; i < 25; i++) {
-        pixels.setPixelColor(i, 0);
-        pixels.show();
-      }
+      digitalWrite(6, HIGH);
     }
   
     else if(set_illu == 1) {
-      for (int i = 0; i < 25; i++) {
-        pixels.setPixelColor(i, 0);
-        pixels.show();
-      }
-      pixels.setPixelColor(12, 255, 255, 255);
-      pixels.show();
-    }
-  
-    else if(set_illu == 2) {
-      for (int i = 0; i < 25; i++) {
-        pixels.setPixelColor(i, 0);
-        pixels.show();
-      }
-      for(int i = 5; i < 10; i++){
-        pixels.setPixelColor(i, 255, 255, 255);
-        pixels.show();
-      }
-      for(int i = 15; i < 20; i++) {
-        pixels.setPixelColor(i, 255, 255, 255);
-        pixels.show();
-      }
+      digitalWrite(6, LOW);
     }
   
     if(temp > set_temp+1) {
-        digitalWrite(6, HIGH);
-        digitalWrite(7, LOW);
-        digitalWrite(8, LOW);
-    }
-    else if(temp < set_temp-1) {
-        digitalWrite(6, LOW);
         digitalWrite(7, HIGH);
         digitalWrite(8, LOW);
+        digitalWrite(9, LOW);
+    }
+    else if(temp < set_temp-1) {
+        digitalWrite(7, LOW);
+        digitalWrite(8, HIGH);
+        digitalWrite(9, LOW);
     }
     else {
-      digitalWrite(6, LOW);
-      digitalWrite(7, HIGH);
-      digitalWrite(8, LOW);
+      digitalWrite(7, LOW);
+      digitalWrite(8, HIGH);
+      digitalWrite(9, LOW);
     }
     
     if(hum > set_hum+1) {
-        digitalWrite(9, HIGH);
-        digitalWrite(10, LOW);
+        digitalWrite(10, HIGH);
         digitalWrite(11, LOW);
+        digitalWrite(12, LOW);
     }
     else if(hum < set_hum-1) {
-        digitalWrite(9, LOW);
         digitalWrite(10, LOW);
-        digitalWrite(11, HIGH);
+        digitalWrite(11, LOW);
+        digitalWrite(12, HIGH);
     }
     else {
-      digitalWrite(9, LOW);
-      digitalWrite(10, HIGH);
-      digitalWrite(11, LOW);
+      digitalWrite(10, LOW);
+      digitalWrite(11, HIGH);
+      digitalWrite(12, LOW);
     }
 
     delay(3000);
@@ -190,7 +165,7 @@ void loop() {
     sens += "&g_humidity=";
     sens += g_hum;
     sens += "&machine_num=1";
-    String cmd = "POST /ARuploadData HTTP/1.1\r\nHost: 175.208.85.188\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: ";
+    String cmd = "POST /ARuploadData HTTP/1.1\r\nHost: dalreak-nas.duckdns.org\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: ";
     cmd += String(sens.length());
     cmd += "\r\n\r\n";
     cmd += sens;
