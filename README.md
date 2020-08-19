@@ -48,7 +48,7 @@ void loop(){
   // stack이 5 미만일때 GET 문장 구현
   if(stack < 5){
     // GET을 하기 위해 mmd에 명령어 입력
-    String mmd = "GET /ARgetRecentData/1 HTTP/1.1\r\nHost: 175.208.85.188:8421\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n";
+    String mmd = "GET /ARgetRecentData/1 HTTP/1.1\r\nHost: dalreak-nas.duckdns.org:999\r\nContent-Type: application/x-www-form-urlencoded\r\n\r\n";
     // GET을 send 사용하여 전송
     wifi.send(mmd.c_str(), mmd.length());
     
@@ -95,7 +95,7 @@ void loop(){
     sens += g_hum;
     sens += "&machine_num=1";
     // POST를 하기 위해 cmd에 명령어 입력후 앞에 sens 값들 합치기
-    String cmd = "POST /ARuploadData HTTP/1.1\r\nHost: 175.208.85.188\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: ";
+    String cmd = "POST /ARuploadData HTTP/1.1\r\nHost: dalreak-nas.duckdns.org\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: ";
     cmd += String(sens.length());
     cmd += "\r\n\r\n";
     cmd += sens;
@@ -115,55 +115,26 @@ void loop(){
 }
 ~~~
 
-## 5 X 5 matrix LED를 사용한 조도 제어
+## 식물 생장용 LED를 사용 및 조도 제어
 
-> LED 25개를 전부 사용하는것은 아두이노 우노의 출력 전압이 약하기때문에 불가능
+> 12V의 전압을 필요로 하는 식물 생장용 LED를 사용하기 위해 외부 전원 사용
 
-> 밝을때 10개, 어두울때 1개를 킴으로써 조도 제어
+> 릴레이 모듈을 사용함으로써 아두이노로 LED의 ON/OFF 제어를 가능하게 함
 
 ~~~
-#include <Adafruit_NeoPixel.h>  // LED를 제어하기위한 라이브러리 정의
-
-Adafruit_NeoPixel pixels = Adafruit_NeoPixel(25, 13, NEO_GRB + NEO_KHZ800); // 픽셀 25개를 제어하는 핀을 13번으로 지정
-
 void setup() {
-  pixels.setBrightness(255);
-  pixels.begin();  // 네오픽셀 제어 시작
-  pixels.show();  // 네오픽셀 초기화
+  pinMode(6, OUTPUT)
 }
 
 void loop() {
   if(stack < 5) {
-    // GET해서 set_illu가 0일때 모든 LED 소등
+    // GET해서 set_illu가 0일때 LED 소등
     if(set_illu == 0) {
-      for (int i = 0; i < 25; i++) {
-        pixels.setPixelColor(i, 0);
-        pixels.show();
-      }
+      digitalWrite(6, LOW);
     }
-    // GET해서 set_illu가 1일때 LED 1개만 점등
-    else if(set_illu == 1) {
-      for (int i = 0; i < 25; i++) {
-        pixels.setPixelColor(i, 0);
-        pixels.show();
-      }
-      pixels.setPixelColor(12, 255, 255, 255);
-      pixels.show();
-    }
-    // GET해서 set_illu가21일때 LED 10개 점등
-    else if(set_illu == 2) {
-      for (int i = 0; i < 25; i++) {
-        pixels.setPixelColor(i, 0);
-        pixels.show();
-      }
-      for(int i = 5; i < 10; i++){
-        pixels.setPixelColor(i, 255, 255, 255);
-        pixels.show();
-      }
-      for(int i = 15; i < 20; i++) {
-        pixels.setPixelColor(i, 255, 255, 255);
-        pixels.show();
-      }
+    // GET해서 set_illu가 1일때 점등
+    else if(set_illu == 1) {}
+      digitalWrite(6, HIGH);
     }
   }
 }
@@ -180,6 +151,8 @@ void loop() {
 > 측정한 온습도값과 토양습도값에따라 3색 LED와 펌프를 제어
 
 > 측정한 온습도값을 LCD에 표시
+
+> 펌프때문에 아두이노의 전압이 부족해져 다른 장치들의 동작이 불안해 지는 것을 방지하기 위해 외부 전압을 사용하고 이를 제어하기위해 릴레이 모듈 사용
 
 ~~~
 // DHT-22, LCD를 사용하기 위한 라이브러리 선언
@@ -200,14 +173,14 @@ void setup() {
   pinMode(4, OUTPUT);
   
   // 측정한 온도값과 세팅값을 비교해 3색 LED를 키기위한 6, 7, 8번 디지털포트 정의
-  pinMode(6, OUTPUT);
   pinMode(7, OUTPUT);
   pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
   
   // 측정한 습도값과 세팅값을 비교해 3색 LED를 키기위한 9, 10, 11번 디지털포트 정의
-  pinMode(9, OUTPUT);
   pinMode(10, OUTPUT);
   pinMode(11, OUTPUT);
+  pinMode(12, OUTPUT);
   
   // lcd를 사용하기 위한 초기화작업 진행
   lcd.init();
@@ -251,41 +224,41 @@ void loop() {
     // 너무 예민하게 반응하지 않기 위해 1의 오차값을 둠
     // 현재 온도가 세팅값보다 높을 시 적색등 점등
     if(temp > set_temp+1) {
-        digitalWrite(6, HIGH);
-        digitalWrite(7, LOW);
+        digitalWrite(7, HIGH);
         digitalWrite(8, LOW);
+        digitalWrite(9, LOW);
     }
     // 현재 온도가 세팅값보다 낮을 시 청색등 점등
     else if(temp < set_temp-1) {
-        digitalWrite(6, LOW);
-        digitalWrite(7, HIGH);
-        digitalWrite(8, LOW);
+        digitalWrite(7, LOW);
+        digitalWrite(8, HIGH);
+        digitalWrite(9, LOW);
     }
     // 현재 온도가 세팅값과 비슷할시 녹색등 점등
     else {
-      digitalWrite(6, LOW);
-      digitalWrite(7, HIGH);
-      digitalWrite(8, LOW);
+      digitalWrite(7, LOW);
+      digitalWrite(8, HIGH);
+      digitalWrite(9, LOW);
     }
     
     // 현재 습도값과 세팅값의 차이에따른 LED 점등
     // 너무 예민하게 반응하지 않기 위해 1의 오차값을 둠
     // 현재 습도가 세팅값보다 높을 시 적색등 점등
     if(hum > set_hum+1) {
-        digitalWrite(9, HIGH);
-        digitalWrite(10, LOW);
+        digitalWrite(10, HIGH);
         digitalWrite(11, LOW);
+        digitalWrite(12, LOW);
     }
     // 현재 습도가 세팅값보다 낮을 시 청색등 점등
     else if(hum < set_hum-1) {
-        digitalWrite(9, LOW);
         digitalWrite(10, LOW);
-        digitalWrite(11, HIGH);
+        digitalWrite(11, LOW);
+        digitalWrite(12, HIGH);
     }
     // 현재 습도가 세팅값과 비슷할시 녹색등 점등
     else {
-      digitalWrite(9, LOW);
-      digitalWrite(10, HIGH);
-      digitalWrite(11, LOW);
+      digitalWrite(10, LOW);
+      digitalWrite(11, HIGH);
+      digitalWrite(12, LOW);
     }
   }
